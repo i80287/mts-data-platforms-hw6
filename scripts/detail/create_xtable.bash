@@ -19,6 +19,6 @@ psql -d idp -c "CREATE EXTERNAL TABLE team_5_external_table_for_spark_csv (
 LOCATION ('gpfdist://localhost:8807/for_spark.csv')
 FORMAT 'CSV' (HEADER);"
 
-psql -d idp -c "SELECT * FROM team_5_external_table_for_spark_csv LIMIT 20;"
+psql -d idp -c "SELECT * FROM team_5_external_table_for_spark_csv LIMIT 15;"
 
 pgrep --full "gpfdist -p 8807" | xargs kill

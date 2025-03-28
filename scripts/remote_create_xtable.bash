@@ -6,7 +6,7 @@ source .env
 
 sshpass -p "$HW6_USER_PWD" \
     scp \
-    .env \
+    detail/for_spark.csv \
     detail/create_xtable.bash \
     "$HW6_USER@$HW6_HOST_PUBLIC_IP:/home/$HW6_USER/team-5-data"
 
