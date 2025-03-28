@@ -34,3 +34,9 @@ FORMAT 'CSV' (HEADER);
 ```sql
 SELECT * FROM team_5_external_table_for_spark_csv LIMIT 15;
 ```
+
+Выполнение скрипта: (при выполнении важно находиться в папке `scripts`)
+```bash
+cd scripts
+./remote_create_xtable.bash
+```
