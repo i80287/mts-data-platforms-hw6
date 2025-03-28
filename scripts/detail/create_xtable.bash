@@ -1,10 +1,28 @@
 #! /usr/bin/env bash
 
-gpfdist -p 8807 -d /home/user/team-5-data &
+set -e
 
-psql -d idp -c "DROP EXTERNAL TABLE IF EXISTS team_5_external_table_for_spark_csv;"
+echo "pwd = $(pwd)"
 
-psql -d idp -c "CREATE EXTERNAL TABLE team_5_external_table_for_spark_csv (
+source .env
+
+if [ -z "$GPFDIST_PORT" ]; then
+    echo "> GPFDIST_PORT is not set"
+    exit 1
+fi
+
+if [[ $(pgrep --full "gpfdist -p $GPFDIST_PORT") ]]; then
+    echo "> Restarting gpfdist on the port $GPFDIST_PORT..."
+    pgrep --full "gpfdist -p $GPFDIST_PORT" | xargs kill
+else
+    echo "> Starting gpfdist on the port $GPFDIST_PORT..."
+fi
+gpfdist -p "$GPFDIST_PORT" -d /home/user/team-5-data &
+
+table_name=team_5_external_table_for_spark_csv
+echo "> Creating external table $table_name..."
+psql -d idp -c "DROP EXTERNAL TABLE IF EXISTS $table_name;"
+psql -d idp -c "CREATE EXTERNAL TABLE $table_name (
     brand text,
     item_id bigint,
     ram_gb bigint,
@@ -16,9 +34,8 @@ psql -d idp -c "CREATE EXTERNAL TABLE team_5_external_table_for_spark_csv (
     weight numeric(20, 5),
     display_size_inch numeric(20, 5)
 )
-LOCATION ('gpfdist://localhost:8807/for_spark.csv')
+LOCATION ('gpfdist://localhost:$GPFDIST_PORT/for_spark.csv')
 FORMAT 'CSV' (HEADER);"
 
-psql -d idp -c "SELECT * FROM team_5_external_table_for_spark_csv LIMIT 15;"
-
-pgrep --full "gpfdist -p 8807" | xargs kill
+echo "> Selecting 15 rows from the $table_name..."
+psql -d idp -c "SELECT * FROM $table_name LIMIT 15;"
